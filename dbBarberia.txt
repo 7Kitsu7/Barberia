@@ -1,0 +1,58 @@
+
+-- 1. TABLA DE BARBERÍAS
+CREATE TABLE barberias (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    direccion TEXT NOT NULL,
+    telefono VARCHAR(20),
+    descripcion TEXT,
+    logo_url TEXT,
+    puntuacion DECIMAL(3,2) DEFAULT 5.0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 2. TABLA DE SERVICIOS (Relacionada a Barberías)
+CREATE TABLE servicios (
+    id SERIAL PRIMARY KEY,
+    barberia_id INTEGER REFERENCES barberias(id) ON DELETE CASCADE,
+    nombre VARCHAR(100) NOT NULL,
+    precio DECIMAL(10, 2) NOT NULL,
+    duracion_minutos INTEGER DEFAULT 30,
+    descripcion TEXT
+);
+
+-- 3. ESCUELA (Cortes gratis/Prácticas)
+CREATE TABLE escuela (
+    id SERIAL PRIMARY KEY,
+    barberia_id INTEGER REFERENCES barberias(id) ON DELETE CASCADE,
+    nombre_curso VARCHAR(150),
+    aplica_corte_gratis BOOLEAN DEFAULT FALSE,
+    cupos_disponibles INTEGER DEFAULT 0,
+    fecha_inicio DATE
+);
+
+-- 4. TIENDA (Productos por barbería)
+CREATE TABLE productos (
+    id SERIAL PRIMARY KEY,
+    barberia_id INTEGER REFERENCES barberias(id) ON DELETE CASCADE,
+    nombre VARCHAR(100) NOT NULL,
+    precio DECIMAL(10, 2) NOT NULL,
+    stock INTEGER DEFAULT 0,
+    imagen_url TEXT
+);
+
+-- 5. EVENTOS (Batallas, Capacitación, Campañas)
+-- Usamos un ENUM para los tipos de evento
+CREATE TYPE tipo_evento AS ENUM ('batalla', 'capacitacion', 'campaña');
+
+CREATE TABLE eventos (
+    id SERIAL PRIMARY KEY,
+    titulo VARCHAR(200) NOT NULL,
+    descripcion TEXT,
+    tipo tipo_evento NOT NULL,
+    fecha_evento TIMESTAMP NOT NULL,
+    ubicacion TEXT,
+    organizador_id INTEGER REFERENCES barberias(id) ON DELETE SET NULL, -- Si lo organiza una barbería
+    imagen_banner TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
